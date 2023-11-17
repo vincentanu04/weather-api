@@ -1,9 +1,21 @@
 const UNSPLASH_API_KEY = "_c3NxG1sZOA1HfpR32_bFcYuAsVeEqUoXQmPEF782vs";
+const search_button = document.querySelector('.search_button');
+const input = document.querySelector('input');
+const country = document.querySelector('.country');
+const city = document.querySelector('.city');
+const time = document.querySelector('.time');
+const description = document.querySelector('.description');
+const temp = document.querySelector('.temp');
+const tempButton = document.querySelector('.switch');
+
+let globalJSON;
+let celsiusNotFahrenheit = true;
 
 async function fetchWeather(location) {
     const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=99957c311f1042c0bdf83440231611&q=${location}`);
     const json = await response.json();
     const parsedJSON = parseJSON(json);
+    globalJSON = parsedJSON;
     displayData(parsedJSON);
 };
 
@@ -45,6 +57,13 @@ function parseCurrent(json) {
 async function displayData(json) {
     const descriptionPhotoUrl = await getPhotoUrl(json.description);
     document.body.style.backgroundImage = `url(${descriptionPhotoUrl})`;
+
+    country.textContent = json.country;
+    city.textContent = json.city;
+    time.textContent = 'Local Time: ' + json.localTime;
+
+    description.textContent = json.description;
+    temp.textContent = json.temp_c + '°C';
 };
 
 async function getPhotoUrl(description) {
@@ -53,4 +72,26 @@ async function getPhotoUrl(description) {
     return json.results[0].urls.full;
 };
 
-fetchWeather('poland')
+function changeTemp() {
+    if (celsiusNotFahrenheit) {
+        tempButton.textContent = 'Change to °C';
+        temp.textContent = globalJSON.temp_f + '°F';
+        celsiusNotFahrenheit = false
+    } else {
+        tempButton.textContent = 'Change to °F';
+        temp.textContent = globalJSON.temp_c + '°C';
+        celsiusNotFahrenheit = true
+    };
+};
+
+search_button.addEventListener('click', () => fetchWeather(input.value))
+
+tempButton.addEventListener('click', () => changeTemp())
+
+input.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') {
+        fetchWeather(input.value);
+    }
+});
+
+fetchWeather('Kuala Lumpur')
