@@ -7,16 +7,27 @@ const time = document.querySelector('.time');
 const description = document.querySelector('.description');
 const temp = document.querySelector('.temp');
 const tempButton = document.querySelector('.switch');
+const main = document.querySelector('main');
+const loadingElement = document.createElement('img');
+loadingElement.src = "https://media4.giphy.com/media/TAjMWrPR2Zka3T1M7z/giphy.gif?cid=ecf05e47far2ijw88o8hop5kyeqoysy7psu19ssodbx23rm2&ep=v1_stickers_search&rid=giphy.gif&ct=s";
+loadingElement.classList.add('loading');
 
 let globalJSON;
 let celsiusNotFahrenheit = true;
 
 async function fetchWeather(location) {
-    const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=99957c311f1042c0bdf83440231611&q=${location}`);
-    const json = await response.json();
-    const parsedJSON = parseJSON(json);
-    globalJSON = parsedJSON;
-    displayData(parsedJSON);
+    main.appendChild(loadingElement);
+    try{
+        const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=99957c311f1042c0bdf83440231611&q=${location}`);
+        const json = await response.json();
+        const parsedJSON = parseJSON(json);
+        globalJSON = parsedJSON;
+        displayData(parsedJSON);
+    } catch (err) {
+        alert(err);
+    } finally {
+        main.removeChild(loadingElement);
+    };
 };
 
 function parseJSON(json) {
